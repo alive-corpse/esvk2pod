@@ -1,11 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+Simple wrapper around vk.com api for getting items from open walls by Evgeniy Shumilov <evgeniy.shumilov@gmail.com>
+Requirements: requests, json
+"""
+
 import json
-import base64
 import requests
 
+
 class esVKWall:
+
     def __init__(self, api='5.60', uagent='Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1'):
         self.s = requests.Session()
         self.s.headers['User-Agent'] = uagent
@@ -23,7 +29,7 @@ class esVKWall:
     def getWall(self, gname, count=20, offset=0):
         if gname:
             group = self.getGroup(gname)
-            gid = group['gid']
+            gid = group['id']
             raw = self.s.get(self.baseurl + 'wall.get?v=' + self.api + '&owner_id=-' + str(gid) + '&count=' +
                              str(count) + '&offset=' + str(offset))
             wall = json.loads(raw.text)
