@@ -15,18 +15,21 @@ import libs.server.wsgiserver as wsgiserver
 route = bottle.route
 response = bottle.response
 
+if len(sys.argv) >= 4:
+    urlpref = sys.argv[3]
+else:
+    urlpref = 'localhost'
 if len(sys.argv) >= 3:
-    port = int(sys.argv[1])
     host = sys.argv[2]
-elif len(sys.argv) == 2:
-    port = int(sys.argv[1])
+else:
     host = 'localhost'
+if len(sys.argv) >= 2:
+    port = int(sys.argv[1])
 else:
     port = 8080
-    host = 'localhost'
 
 audiopostfix = 'vk2podaudio'
-localaudiourl = 'http://%s:%s/%s' % (host, str(port), audiopostfix)
+localaudiourl = 'http://%s:%s/%s' % (urlpref, str(port), audiopostfix)
 
 vw = esVKWall()
 
