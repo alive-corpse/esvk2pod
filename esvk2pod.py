@@ -15,6 +15,13 @@ import libs.server.wsgiserver as wsgiserver
 route = bottle.route
 response = bottle.response
 
+if len(sys.argv) >= 5:
+    if sys.argv[4]:
+        urlport = sys.srgv[4]
+    else:
+        urlport = 8080
+else:
+    urlport = 8080
 if len(sys.argv) >= 4:
     if sys.argv[3]:
         urlpref = sys.argv[3]
