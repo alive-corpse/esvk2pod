@@ -45,8 +45,20 @@ else:
 
 vw = esVKWall()
 
+def duration(sec):
+    s = int(sec)
+    dur = str(s % 60).zfill(2)
+    if s > 60:
+        dur = str(s / 60 % 60).zfill(2) + ':' + dur
+    if s > 360:
+        dur = str(s / 60 / 60) + ':' + dur
+    return dur
+
+
 def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
     if gname:
+        if count > 100:
+            count = 100
         group = vw.getGroup(gname)
         if group['is_closed'] == 0:
             photo = vw.getBiggestPhoto(group)
@@ -74,10 +86,13 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                         link = 'https://vk.com/wall' + str(i['owner_id']) + '_' + str(['id'])
                                     else:
                                         link = ''
-                                    rss.addItem(title=a[c]['artist'] + ' - ' + a[c]['title'], description=description,
-                                                link=link, enclosure_url=localaudiourl + '/' +
-                                                base64.b16encode(a[c]['url'].split('?')[0]) + '.mp3',
-                                                enclosure_length=str(a[c]['duration']), enclosure_type='audio/mpeg')
+                                    if a[c].has_key('duration'):
+                                        dur = duration(a[c]['duration'])
+                                    rss.addItem(title=a[c]['artist'] + ' - ' + a[c]['title'] + ' [' + dur
+                                                + ']', description=description, link=link, 
+                                                enclosure_url=localaudiourl + '/' 
+                                                + base64.b16encode(a[c]['url'].split('?')[0]) + '.mp3',
+                                                enclosure_type='audio/mpeg')
             return rss.Feed()
         else:
             print "ERROR: Group is closed"
