@@ -16,15 +16,24 @@ route = bottle.route
 response = bottle.response
 
 if len(sys.argv) >= 4:
-    urlpref = sys.argv[3]
+    if sys.argv[3]:
+        urlpref = sys.argv[3]
+    else:
+        urlpref = 'localhost'
 else:
     urlpref = 'localhost'
 if len(sys.argv) >= 3:
-    host = sys.argv[2]
+    if sys.argv[2]:
+        host = sys.argv[2]
+    else:
+        host = 'lcalhost'
 else:
     host = 'localhost'
 if len(sys.argv) >= 2:
-    port = int(sys.argv[1])
+    if sys.argv[2]:
+        port = int(sys.argv[1])
+    else:
+        port = 8080
 else:
     port = 8080
 
