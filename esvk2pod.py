@@ -47,9 +47,7 @@ vw = esVKWall()
 
 def duration(sec):
     s = int(sec)
-    dur = str(s % 60).zfill(2)
-    if s > 60:
-        dur = str(s / 60 % 60).zfill(2) + ':' + dur
+    dur = str(s / 60 % 60).zfill(2) + ':' + str(s % 60).zfill(2)
     if s > 360:
         dur = str(s / 60 / 60) + ':' + dur
     return dur
@@ -113,12 +111,24 @@ def vk2podq(query='', count=10, offset=0):
         response.headers['Content-Type'] = 'text/plain'
         return 'Empty request'
 
-@route('/' + audiopostfix + '/<query>')
+@route('/' + audiopostfix + '/<query>', method='GET')
 def audioStream(query=''):
     if query:
         url = base64.b16decode(query[:-4])
-        response.headers['Content-Type'] = 'audio/mpeg'
+        headers = vw.s.head(url).headers
+        for h in ['content-length', 'expires', 'content-type']:
+            response.headers.append(h, headers[h])
+
         return vw.s.get(url, stream=True).raw
+    else:
+        response.headers['Content-Type'] = 'text/plain'
+        return 'Empty request'
+
+@route('/' + audiopostfix + '/<query>', method='HEAD')
+def audioHead(query=''):
+    if query:
+        url = base64.b16decode(query[:-4])
+        return vw.s.head(url).raw
     else:
         response.headers['Content-Type'] = 'text/plain'
         return 'Empty request'
