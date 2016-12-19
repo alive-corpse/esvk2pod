@@ -26,7 +26,7 @@ if len(sys.argv) >= 3:
     if sys.argv[2]:
         host = sys.argv[2]
     else:
-        host = 'lcalhost'
+        host = 'localhost'
 else:
     host = 'localhost'
 if len(sys.argv) >= 2:
