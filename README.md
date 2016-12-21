@@ -1,6 +1,8 @@
 # ESVK2Pod
+
+
 It's utility for convert vk wall records to rss feed, adapted for podcast players. Main idea of this service - to make some instrument for getting public accessible audiobooks and music from vk.com group wall's records to the podcast players like as AnthennaPod for android or any others without logging in or tokens. Also as a DevOps I like when small application has small dependencies and deploy simplicity.
-======
+
 
 
 ## Dependencies
@@ -21,14 +23,16 @@ It's utility for convert vk wall records to rss feed, adapted for podcast player
 ```
      sudo pip install --upgrade lxml && sudo pip install --upgrade requests # 
 ```
+
 Maybe you'll need to install libxslt-devel libxml2-devel under RH based systems
-======
+
+
 
 ## Parameters
 There are three parameters to start service
-    1st parameter - port (default 8080)
-    2nd parameter - ip address (default localhost)
-    3th parameter - url prefix and optionally port for audiolink generation
+ - 1st parameter - port (default 8080)
+ - 2nd parameter - ip address (default localhost)
+ - 3th parameter - url prefix and optionally port for audiolink generation
     
     
 ##### Examples
@@ -46,18 +50,24 @@ There are three parameters to start service
         proxy like Nginx. Sure, you can use IP address
         instead domain name and you can use domain without
         port definition.
-======
+
 
 
 ## Using examples
 You can just append one of the following urls to your podcast player, changing "groupname" to the real name of vk group (for example, try free_audiobooks):
+
 http://localhost:8080/vk2pod/groupname
+
   Will get 20 records from wall and filter out records that hasn't audio attach, then it will made rss item for each audio attach with content of original record
+  
 http://localhost:8080/vk2pod/groupname/30
+
   The same, but it will get 30 records instead 20. Count maximum is 100 at the moment, but if you need more, you can easily fix it in code. :)
+  
 http://localhost:8080/vk2pod/groupname/30/5
+
   The same that above example, but with offset of 5 records
-======
+
 
 
 ## Docker container
@@ -67,4 +77,4 @@ Attention: container's building will download original code from github instead 
 
 
 ## Notice
-This code is provided for free and without any garanties. 
+This code is provided for free and without any garanties. But you can feel free to send me any feedback to evgeniy.shumilov@gmail.com
