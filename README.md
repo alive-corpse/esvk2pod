@@ -73,7 +73,6 @@ http://localhost:8080/vk2pod/groupname/30/5
 ## Docker container
 You can find Dockerfile in directory docker. Container based on debian:latest. I think, you can change it to ubutu:latest, but I haven't check it yet. Also you can use scripts build-run.sh and stop-remove.sh from docker folder. The first script has one parameter, than is equals of 3th parameters for runnning service. For example, if you frontend has domain name test.com, you can build container with command ./build-run.sh test.com
 Attention: container's building will download original code from github instead getting local code from upper level directory.
-======
 
 
 ## Notice
