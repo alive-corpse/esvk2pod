@@ -249,3 +249,5 @@ httpd.serve_forever()
 
 #TODO: favicon
 #TODO: date of post in vk2rss
+#TODO: repost
+#TODO: player
