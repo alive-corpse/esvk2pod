@@ -240,6 +240,7 @@ def audioHead(query=''):
 
 print 'Server will started on host %s and port %s' % (host, port)
 
+bottle.debug(False)
 wsgiapp = bottle.default_app()
 httpd = wsgiserver.Server(wsgiapp, listen=host, port=port)
 httpd.listen = host
