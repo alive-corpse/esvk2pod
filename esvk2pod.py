@@ -246,3 +246,6 @@ httpd = wsgiserver.Server(wsgiapp, listen=host, port=port)
 httpd.listen = host
 httpd.port = port
 httpd.serve_forever()
+
+#TODO: favicon
+#TODO: date of post in vk2rss
