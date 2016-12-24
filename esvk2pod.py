@@ -55,7 +55,7 @@ def duration(sec):
 
 def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
     if gname:
-        if count > 100:
+        if int(count) > 100:
             count = 100
         group = vw.getGroup(gname)
         if group['is_closed'] == 0:
@@ -96,6 +96,100 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
             print "ERROR: Group is closed"
             return ''
 
+def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
+    if gname:
+        if int(count) > 100:
+            count = 100
+        group = vw.getGroup(gname)
+        if group['is_closed'] == 0:
+            photo = vw.getBiggestPhoto(group)
+            if photo:
+                rss = esRss(title=group['name'], link='http://vk.com/' + gname, description=group['description'], image_url=photo)
+            else:
+                rss = esRss(title=group['name'], link='http://vk.com/' + gname, description=group['description'])
+            items = vw.getWall(gname, count, offset)['response']
+            if items.has_key('items'):
+                items = items['items']
+            for i in items:
+                if type(i) == dict:
+                    title = ''
+                    description = ''
+                    if i.has_key('text'):
+                        description = i['text']
+                        title = description.split('\n')[0]
+                    if i.has_key('from_id'):
+                        link = 'https://vk.com/wall' + str(i['from_id']) + '_' + str(i['id'])
+                    elif i.has_key('owner_id'):
+                        link = 'https://vk.com/wall' + str(i['owner_id']) + '_' + str(['id'])
+                    else:
+                        link = ''
+                    if i.has_key('attachments'):
+                        for a in i['attachments']:
+                            for c in a.keys():
+                                if c == 'photo':
+                                    description = vw.getBiggestPhoto(a[c], True) + '<br>' + description
+                                if c == 'audio':
+                                    if a[c].has_key('duration'):
+                                        dur = duration(a[c]['duration'])
+                                    audiotitle = ''
+                                    if a[c].has_key('title'):
+                                        audiotitle = a[c]['title']
+                                    if a[c].has_key('artist'):
+                                        if audiotitle:
+                                            audiotitle = a[c]['artist'] + ' - ' + audiotitle
+                                        else:
+                                            audiotitle = a[c]['artist']
+                                    description += '<br><a href="%s">%s</a>' % (localaudiourl + '/' +
+                                                base64.b16encode(a[c]['url'].split('?')[0]) + '.mp3', audiotitle)
+                                if c == 'link':
+                                    if a[c].has_key('description'):
+                                        description = a[c]['description']
+                                    if a[c].has_key('title'):
+                                        ltitle = a[c]['title']
+                                        if not title and len(i['attachments']) == 1:
+                                            title = ltitle
+                                    else:
+                                        ltitle = ''
+                                    if a[c].has_key('photo'):
+                                        photo = vw.getBiggestPhoto(a[c]['photo'])
+                                        if ltitle:
+                                            description += '</br><a href="%s"><img src="%s" alt="%s"></a>' % (
+                                            a[c]['url'], photo, ltitle)
+                                        else:
+                                            description += '</br><a href="%s"><img src="%s"></a>' % (
+                                            a[c]['url'], photo)
+                                    else:
+                                        if ltitle:
+                                            description += '</br><a href="%s">%s</a>' % (a[c]['url'], ltitle)
+                                if c == 'doc':
+                                    if a[c].has_key('title'):
+                                        dtitle = a[c]['title']
+                                    if a[c].has_key('preview'):
+                                        if a[c]['preview'].has_key('photo'):
+                                            if dtitle:
+                                                photo = '<a href="%s">%s</br><img src="%s" alt="%s"></a>' % \
+                                                    (a[c]['url'], dtitle, vw.getBiggestPhoto(a[c]['preview']['photo']),
+                                                    dtitle)
+                                            else:
+                                                photo = '<a href="%s"><img src="%s"></a>' % (a[c]['url'],
+                                                    vw.getBiggestPhoto(a[c]['preview']['photo']))
+                                        else:
+                                            photo = ''
+                                    else:
+                                        photo = ''
+                                    if photo:
+                                        description += '<br>' + photo
+                                    else:
+                                        description += '<br><a href="%s">%s</a>' % (a[c]['url'], a[c]['title'])
+                    if not (title and description):
+                        title = '---'
+                    rss.addItem(title=title, description=description, link=link, pubDate=str(i['date']))
+            return rss.Feed()
+        else:
+            print "ERROR: Group is closed"
+            return ''
+
+
 @route('/')
 def root():
     return 'Hello!'
@@ -107,6 +201,17 @@ def vk2podq(query='', count=10, offset=0):
     if query:
         response.headers['Content-Type'] = 'xml/application'
         return wall2Pod(query, localaudiourl=localaudiourl, count=count, offset=offset)
+    else:
+        response.headers['Content-Type'] = 'text/plain'
+        return 'Empty request'
+
+@route('/vk2rss/<query>')
+@route('/vk2rss/<query>/<count>')
+@route('/vk2rss/<query>/<count>/<offset>')
+def vk2rssq(query='', count=10, offset=0):
+    if query:
+        response.headers['Content-Type'] = 'xml/application'
+        return wall2RSS(query, localaudiourl=localaudiourl, count=count, offset=offset)
     else:
         response.headers['Content-Type'] = 'text/plain'
         return 'Empty request'

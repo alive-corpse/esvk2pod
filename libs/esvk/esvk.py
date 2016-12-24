@@ -41,25 +41,32 @@ class esVKWall:
         if obj:
             photo = ''
             photosize = 0
-            for p in obj.keys():
-                if p.startswith('photo_') or p.startswith('src_'):
-                    psize = p.split('_')[1]
-                    if psize.endswith('small') or psize.endswith('medium') or psize.endswith('big'):
-                        if psize == 'small':
-                            psize = 1
-                        elif psize == 'medium':
-                            psize = 2
-                        elif psize == 'big':
-                            psize = 3
-                        elif psize.startswith('x'):
-                            psize = 3 + len(psize.replace('big', ''))
-                        else:
-                            psize = -1
-                    else:
-                        psize = int(psize)
-                    if photosize < psize:
-                        photo = obj[p]
+            if obj.has_key('sizes'):
+                for s in obj['sizes']:
+                    psize = s['height'] * s['width']
+                    if photosize <= psize:
+                        photo = s['src']
                         photosize = psize
+            else:
+                for p in obj.keys():
+                    if p.startswith('photo_') or p.startswith('src_'):
+                        psize = p.split('_')[1]
+                        if psize.endswith('small') or psize.endswith('medium') or psize.endswith('big'):
+                            if psize == 'small':
+                                psize = 1
+                            elif psize == 'medium':
+                                psize = 2
+                            elif psize == 'big':
+                                psize = 3
+                            elif psize.startswith('x'):
+                                psize = 3 + len(psize.replace('big', ''))
+                            else:
+                                psize = -1
+                        else:
+                            psize = int(psize)
+                        if photosize < psize:
+                            photo = obj[p]
+                            photosize = psize
             if photo and wrap:
                 return '<img src="%s">' % photo
             else:
