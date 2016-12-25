@@ -5,6 +5,7 @@
 Microservice for making podcast rss feed from vk.com audiogroup's walls
 """
 
+import os
 import sys
 import base64
 from libs.esvk.esvk import esVKWall
@@ -14,6 +15,7 @@ import libs.server.wsgiserver as wsgiserver
 
 route = bottle.route
 response = bottle.response
+static = bottle.static_file
 
 if len(sys.argv) >= 4:
     if sys.argv[3]:
@@ -194,6 +196,10 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
 def root():
     return 'Hello!'
 
+@route('/favicon.ico')
+def get_favicon():
+    return static(filename='favicon.ico', root=os.path.join(os.path.curdir, 'static'), mimetype='image/x-icon')
+
 @route('/vk2pod/<query>')
 @route('/vk2pod/<query>/<count>')
 @route('/vk2pod/<query>/<count>/<offset>')
@@ -247,7 +253,6 @@ httpd.listen = host
 httpd.port = port
 httpd.serve_forever()
 
-#TODO: favicon
 #TODO: date of post in vk2rss
 #TODO: repost
 #TODO: player
