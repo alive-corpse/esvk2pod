@@ -256,3 +256,4 @@ httpd.serve_forever()
 #TODO: date of post in vk2rss
 #TODO: repost
 #TODO: player
+#TODO: video
