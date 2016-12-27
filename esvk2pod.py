@@ -134,7 +134,7 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
                         for a in i['attachments']:
                             for c in a.keys():
                                 if c == 'photo':
-                                    description += vw.getBiggestPhoto(a[c], True) + '<br>' + description
+                                    description += vw.getBiggestPhoto(a[c], True) + '<br>'
                                 if c == 'video':
                                     if a[c].has_key('description'):
                                         description += '</br><a href="%s"><img src="%s"></a></br>%s [VIDEO]' % (link,
