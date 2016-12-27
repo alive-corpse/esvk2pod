@@ -149,7 +149,7 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                                 base64.b16encode(a[c]['url'].split('?')[0]) + '.mp3', audiotitle)
                                 if c == 'link':
                                     if a[c].has_key('description'):
-                                        description = a[c]['description']
+                                        description += '</br>' + a[c]['description']
                                     if a[c].has_key('title'):
                                         ltitle = a[c]['title']
                                         if not title and len(i['attachments']) == 1:
