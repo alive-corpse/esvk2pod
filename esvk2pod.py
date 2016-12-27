@@ -102,6 +102,7 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
             print "ERROR: Group is closed"
             return ''
 
+
 def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
     if gname:
         if int(count) > 100:
@@ -117,6 +118,7 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
             if items.has_key('items'):
                 items = items['items']
             for i in items:
+                print i
                 if type(i) == dict:
                     title = ''
                     description = ''
@@ -133,7 +135,14 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
                         for a in i['attachments']:
                             for c in a.keys():
                                 if c == 'photo':
-                                    description = vw.getBiggestPhoto(a[c], True) + '<br>' + description
+                                    description += vw.getBiggestPhoto(a[c], True) + '<br>' + description
+                                if c == 'video':
+                                    if a[c].has_key('description'):
+                                        description += '</br><a href="%s"><img src="%s"></a></br>%s [VIDEO]' % (link,
+                                                        vw.getBiggestPhoto(a[c]), a[c]['description'])
+                                    else:
+                                        description += '</br><a href="%s"><img src="%s"></a></br> [VIDEO]' % (link,
+                                                        vw.getBiggestPhoto(a[c]))
                                 if c == 'audio':
                                     if a[c].has_key('duration'):
                                         dur = duration(a[c]['duration'])
@@ -265,4 +274,3 @@ httpd.serve_forever()
 
 #TODO: repost
 #TODO: player
-#TODO: video
