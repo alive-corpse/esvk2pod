@@ -3,11 +3,13 @@
 
 """
 Microservice for making podcast rss feed from vk.com audiogroup's walls
+and rss feeds for aggregators
 """
 
 import os
 import sys
 import base64
+from datetime import datetime
 from libs.esvk.esvk import esVKWall
 from libs.esrss.esrss import esRss
 import libs.server.bottle as bottle
@@ -92,7 +94,9 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                                 + ']', description=description, link=link, 
                                                 enclosure_url=localaudiourl + '/' 
                                                 + base64.b16encode(a[c]['url'].split('?')[0]) + '.mp3',
-                                                enclosure_type='audio/mpeg')
+                                                enclosure_type='audio/mpeg',
+                                                pubDate=datetime.strftime(datetime.fromtimestamp(int(i['date'])),
+                                                                          '%a, %d %b %Y %T'))
             return rss.Feed()
         else:
             print "ERROR: Group is closed"
@@ -166,15 +170,20 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                 if c == 'doc':
                                     if a[c].has_key('title'):
                                         dtitle = a[c]['title']
+                                    if a[c].has_key('ext'):
+                                        if a[c]['ext'] == u'gif':
+                                            photo = '<a href="%s">%s</br><img src="%s" alt="%s"></a>' % \
+                                                    (a[c]['url'], dtitle, a[c]['url'], dtitle)
                                     if a[c].has_key('preview'):
                                         if a[c]['preview'].has_key('photo'):
-                                            if dtitle:
+                                            if dtitle and not photo:
                                                 photo = '<a href="%s">%s</br><img src="%s" alt="%s"></a>' % \
                                                     (a[c]['url'], dtitle, vw.getBiggestPhoto(a[c]['preview']['photo']),
                                                     dtitle)
                                             else:
-                                                photo = '<a href="%s"><img src="%s"></a>' % (a[c]['url'],
-                                                    vw.getBiggestPhoto(a[c]['preview']['photo']))
+                                                if not photo:
+                                                    photo = '<a href="%s"><img src="%s"></a>' % (a[c]['url'],
+                                                            vw.getBiggestPhoto(a[c]['preview']['photo']))
                                         else:
                                             photo = ''
                                     else:
@@ -185,7 +194,8 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                         description += '<br><a href="%s">%s</a>' % (a[c]['url'], a[c]['title'])
                     if not (title and description):
                         title = '---'
-                    rss.addItem(title=title, description=description, link=link, pubDate=str(i['date']))
+                    rss.addItem(title=title, description=description, link=link,
+                                pubDate=datetime.strftime(datetime.fromtimestamp(int(i['date'])), '%a, %d %b %Y %T'))
             return rss.Feed()
         else:
             print "ERROR: Group is closed"
@@ -253,7 +263,6 @@ httpd.listen = host
 httpd.port = port
 httpd.serve_forever()
 
-#TODO: date of post in vk2rss
 #TODO: repost
 #TODO: player
 #TODO: video
