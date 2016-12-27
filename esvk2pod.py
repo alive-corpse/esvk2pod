@@ -118,7 +118,6 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
             if items.has_key('items'):
                 items = items['items']
             for i in items:
-                print i
                 if type(i) == dict:
                     title = ''
                     description = ''
