@@ -9,15 +9,11 @@ class esRss:
     RSS lite generator class by Evgeniy Shumilov <evgeniy.shumilov@gmail.com>
     '''
     def __init__(self, title, link='', description='', language='ru', copyright='', image_url='', image_title='',
-                 image_link='', managingEditor='', lastBuildDate='', encoding='UTF-8'):
-        self.xml = Element('xml')
-        self.xml.set('version', '1.0')
+                 image_link='', managingEditor='', lastBuildDate=''):
         self.root = Element('rss')
         self.root.set('version', '2.0')
         self.channel = Element('channel')
         self.root.append(self.channel)
-        if encoding:
-            self.xml.set('encoding', encoding)
         for k in ('title', 'description', 'link', 'language'):
             if eval(k):
                 tmpelem = Element(k)
@@ -97,4 +93,4 @@ class esRss:
             self.__err__('Item should contain title or description')
 
     def Feed(self):
-        return tostring(self.xml) + tostring(self.root)
+        return '<?xml version="1.0" encoding="UTF-8" ?>' + tostring(self.root)
