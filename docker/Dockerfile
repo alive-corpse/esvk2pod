@@ -18,13 +18,13 @@
 # You can find code here:
 #    https://github.com/alive-corpse/esvk2pod
 #
-# Code was builded into portable binaries with nuitka
+# You also can build python code into portable binaries with nuitka
 #    http://nuitka.net/
 
 FROM debian:latest
 MAINTAINER Evgeniy Shumilov <evgeniy.shumilov@gmail.com>
 
-RUN apt-get update; apt-get -y upgrade; apt-get -y autoremove; apt-get install -y python python-lxml python-requests busybox
+RUN apt-get update; apt-get -y upgrade; apt-get -y autoremove; apt-get install -y python python-requests busybox
 ADD https://github.com/alive-corpse/esvk2pod/archive/master.zip /opt
 RUN busybox unzip /opt/master.zip -d /opt; rm /opt/master.zip
 ARG URLPREF=localhost

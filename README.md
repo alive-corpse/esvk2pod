@@ -7,7 +7,6 @@ It's utility for convert vk wall records to rss feed, adapted for podcast player
 
 ## Dependencies
 - python 2.7
-- python-lxml
 - python-requests
 
 
@@ -15,13 +14,13 @@ It's utility for convert vk wall records to rss feed, adapted for podcast player
   For Debian based operation systems:
 
 ```
-     sudo apt-get update && sudo apt-get install -y python python-lxml python-requests 
+     sudo apt-get update && sudo apt-get install -y python python-requests
 ```
 
 
   Using python pip:
 ```
-     sudo pip install --upgrade lxml && sudo pip install --upgrade requests # 
+     sudo pip install --upgrade requests #
 ```
 
 Maybe you'll need to install libxslt-devel libxml2-devel under RH based systems
@@ -74,6 +73,8 @@ http://localhost:8080/vk2pod/groupname/30/5
 You can find Dockerfile in directory docker. Container based on debian:latest. I think, you can change it to ubutu:latest, but I haven't check it yet. Also you can use scripts build-run.sh and stop-remove.sh from docker folder. The first script has one parameter, than is equals of 3th parameters for runnning service. For example, if you frontend has domain name test.com, you can build container with command ./build-run.sh test.com
 Attention: container's building will download original code from github instead getting local code from upper level directory.
 
+## What's new?
+2016.12.31 - Library esrss rewrited with using of xml instead of lxml. So, It's removing one big dependence - python-lxml. Little changes in Docker file.
 
 ## Notice
 This code is provided for free and without any garanties. But you can feel free to send me any feedback to evgeniy.shumilov@gmail.com
