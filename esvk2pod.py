@@ -11,7 +11,7 @@ import sys
 import base64
 from datetime import datetime
 from libs.esvk.esvk import esVKWall
-from libs.esrss.esrss import esRss
+from libs.esrss.esrsslite import esRss
 import libs.server.bottle as bottle
 import libs.server.wsgiserver as wsgiserver
 
