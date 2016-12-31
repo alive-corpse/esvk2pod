@@ -82,6 +82,7 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                     description = vw.getBiggestPhoto(a[c], True) + '<br>' + description
                             for c in a.keys():
                                 if c == 'audio':
+                                    print a[c]['url']
                                     if i.has_key('from_id'):
                                         link = 'https://vk.com/wall' + str(i['from_id']) + '_' + str(i['id'])
                                     elif i.has_key('owner_id'):
@@ -244,11 +245,10 @@ def vk2rssq(query='', count=10, offset=0):
 def audioStream(query=''):
     if query:
         url = base64.b16decode(query[:-4])
-        headers = vw.s.head(url).headers
+        headers = vw.getHeaders(url)
         for h in ['content-length', 'expires', 'content-type']:
             response.headers.append(h, headers[h])
-
-        return vw.s.get(url, stream=True).raw
+        return vw.getContent(url)
     else:
         response.headers['Content-Type'] = 'text/plain'
         return 'Empty request'
@@ -257,7 +257,7 @@ def audioStream(query=''):
 def audioHead(query=''):
     if query:
         url = base64.b16decode(query[:-4])
-        return vw.s.head(url).raw
+        return vw.getHeaders(url)
     else:
         response.headers['Content-Type'] = 'text/plain'
         return 'Empty request'
