@@ -82,7 +82,6 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                     description = vw.getBiggestPhoto(a[c], True) + '<br>' + description
                             for c in a.keys():
                                 if c == 'audio':
-                                    print a[c]['url']
                                     if i.has_key('from_id'):
                                         link = 'https://vk.com/wall' + str(i['from_id']) + '_' + str(i['id'])
                                     elif i.has_key('owner_id'):
@@ -93,9 +92,8 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                         dur = duration(a[c]['duration'])
                                     rss.addItem(title=a[c]['artist'] + ' - ' + a[c]['title'] + ' [' + dur
                                                 + ']', description=description, link=link, 
-                                                enclosure_url=localaudiourl + '/' 
-                                                + base64.b16encode(a[c]['url'].split('?')[0]) + '.mp3',
-                                                enclosure_type='audio/mpeg',
+                                                enclosure_url=localaudiourl + '/' + str(a[c]['owner_id']) + '/' +
+                                                str(a[c]['id']), enclosure_type='audio/mpeg',
                                                 pubDate=datetime.strftime(datetime.fromtimestamp(int(i['date'])),
                                                                           '%a, %d %b %Y %T'))
             return rss.Feed()
@@ -241,23 +239,23 @@ def vk2rssq(query='', count=10, offset=0):
         response.headers['Content-Type'] = 'text/plain'
         return 'Empty request'
 
-@route('/' + audiopostfix + '/<query>', method='GET')
-def audioStream(query=''):
-    if query:
-        url = base64.b16decode(query[:-4])
-        headers = vw.getHeaders(url)
+@route('/' + audiopostfix + '/<owner_id>/<audio_id>', method='GET')
+def audioStream(owner_id='', audio_id=''):
+    if owner_id and audio_id:
+        url = vw.getAudio(owner_id, audio_id)
+        headers = vw.s.head(url).headers
         for h in ['content-length', 'expires', 'content-type']:
             response.headers.append(h, headers[h])
-        return vw.getContent(url)
+        return vw.s.get(url, stream=True).raw
     else:
         response.headers['Content-Type'] = 'text/plain'
         return 'Empty request'
 
-@route('/' + audiopostfix + '/<query>', method='HEAD')
-def audioHead(query=''):
-    if query:
-        url = base64.b16decode(query[:-4])
-        return vw.getHeaders(url)
+@route('/' + audiopostfix + '/<owner_id>/<audio_id>', method='HEAD')
+def audioHead(owner_id='', audio_id=''):
+    if owner_id and audio_id:
+        url = vw.getAudio(owner_id, audio_id)
+        return vw.s.head(url).raw
     else:
         response.headers['Content-Type'] = 'text/plain'
         return 'Empty request'

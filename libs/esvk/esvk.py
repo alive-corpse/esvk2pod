@@ -6,104 +6,50 @@ Simple wrapper around vk.com api for getting items from open walls by Evgeniy Sh
 Requirements: requests, json
 """
 
+import os
+import re
+import sys
 import json
-import urllib2
-from httplib import HTTPConnection
 import requests
 
 
 class esVKWall:
-    user = ''
-    __pwd = ''
-    token = ''
-    authurl = 'https://oauth.vk.com/authorize?client_id=%s&scope=%s&display=mobile&v=5.3&response_type=token'
-    scopes = 'audio'
 
-    def __init__(self, api='5.60', uagent='Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1',
-                 appid='', appsecret=''):
+    def __init__(self, api='5.60', uagent='Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1'):
+        self.s = requests.Session()
+        self.s.headers['User-Agent'] = uagent
         self.api = api
         self.baseurl = 'https://api.vk.com/method/'
-        self.uagent = uagent
-        self.headers = headers = {'User-Agent': uagent}
-        if appid and appsecret:
-            self.appid = appid
-            self.appsecret = appsecret
-
-    def auth(self, uname, passwd):
-        """
-        Authentication method for vkontakte
-        :param uname: Email or phone number of user
-        :param passwd: password for authorisation
-        :return: session token
-        """
-        import re
-        if uname and passwd:
-            s = requests.session()
-        r = self.getContent(self.authurl % (self.appid, self.scopes))
-        authurl = re.findall('action="(.*?)"', r.content.replace('\n', ''))[0]
-        fields = re.findall('<input .*?name="(.*?)".*?value="(.*?)"', r.content.replace('\n', ''))
-        payload = {}
-        for f in fields:
-            payload[f[0]] = f[1]
-        payload['email'] = uname
-        payload['pass'] = passwd
-        r = s.post(authurl, payload)
-        if r.url.find('access_token') == -1:
-            authurl = re.findall('action="(.*?)"', r.content.replace('\n', ''))
-        self.r2 = r = s.post(authurl)
-        self.res = res = re.findall('access_token=(.*?)&expires_in=([0-9]*)&user_id=([0-9]*)', r.url)[0]
-        self.token = res[0]
-        self.expires = res[1]
-        self.user_id = res[2]
-        self.v = vkontakte.API(api_id=self.appid, api_secret=self.appsecret, token=self.token)
-        return self.token
-        else:
-        sys.exit("Username and email should not be empty")
-
-    def login(self):
-        """
-        Login procedure
-        :return: session token
-        """
-        import sys, getpass
-        sys.stdout.write('E-mail or phone number: ')
-        self.user = sys.stdin.readline().replace('\n', '')
-        self.__pwd = getpass.getpass('Password: ')
-        return self.auth(self.user, self.__pwd)
-
-    def getContent(self, url, headers=None):
-        if url:
-            if headers:
-                if 'User-Agent' not in headers.keys():
-                    headers['User-Agent'] = self.headers['User-Agent']
-            else:
-                headers = self.headers
-            return urllib2.urlopen(urllib2.Request(url, None, headers)).read()
-
-    def getHeaders(self, url, headers=None):
-        if url:
-            if headers:
-                if 'User-Agent' not in headers.keys():
-                    headers['User-Agent'] = self.headers['User-Agent']
-            else:
-                headers = self.headers
-            request = urllib2.Request(url=url, headers=headers)
-            request.get_method = lambda: 'HEAD'
-            response = urllib2.urlopen(request).info()
-            return response
+        self.uname = ''
+        self.passwd = ''
+        cpath = os.path.join(os.curdir, 'esvk.conf')
+        if os.path.isfile(cpath):
+            with open(cpath) as f:
+                for l in f.readlines():
+                    k = l.split('=')[0].replace('"', '').strip()
+                    if k == 'uname':
+                        self.uname = '='.join(l.split('=')[1:]).replace('"', '').replace("'", '').strip()
+                    if k == 'passwd':
+                        self.__pwd = '='.join(l.split('=')[1:]).replace('"', '').replace("'", '').strip()
 
     def getGroup(self, gname):
         if gname:
-            resp = self.getContent(self.baseurl + 'groups.getById?v=' + self.api +
-                                '&fields=description&group_ids=' + gname)
-            return json.loads(resp)['response'][0]
+            raw = self.s.get(self.baseurl + 'groups.getById?v=' + self.api + '&fields=description&group_ids=' + gname)
+            group = json.loads(raw.text)
+            return group['response'][0]
+        else:
+            return None
 
     def getWall(self, gname, count=20, offset=0):
         if gname:
             group = self.getGroup(gname)
             gid = group['id']
-            return json.loads(self.getContent(self.baseurl + 'wall.get?v=' + self.api + '&owner_id=-' + str(gid) +
-                                              '&count=' + str(count) + '&offset=' + str(offset)))
+            raw = self.s.get(self.baseurl + 'wall.get?v=' + self.api + '&owner_id=-' + str(gid) + '&count=' +
+                             str(count) + '&offset=' + str(offset))
+            wall = json.loads(raw.text)
+            return wall
+        else:
+            return None
 
     def getBiggestPhoto(self, obj, wrap=False):
         if obj:
@@ -142,9 +88,23 @@ class esVKWall:
         else:
             return ''
 
-    # def getAudio(self, audioid, ownerid, token):
-    #     if audioid and ownerid and token:
-    #         raw = self.s.get(self.baseurl + 'audio.getById?v=' + self.api + '&audios=' + str(audioid) + '_'
-    #                          + str(ownerid))
-    #         link = json.loads(raw.text)
-    #         print link
+    def getAudio(self, owner_id, audio_id):
+        """
+        Method to get audio urls from vk
+        :param audio: array of strings or string like as 'ownerid_id'
+        :return: dict of records like 'ownerid_id': 'audiourl'
+        """
+        if owner_id and audio_id and self.uname and self.__pwd:
+            r = self.s.get('https://m.vk.com/')
+            authurl = re.findall('form method="post" action="(.*)"', r.content)[0]
+            data = {'email': self.uname, 'pass': self.__pwd}
+            r = self.s.post(authurl, data)
+            if r.content.find('<span class="mm_label">') != -1:
+                data = {'act': 'reload_audio', 'al': 1, 'ids': '%s_%s' % (str(owner_id), str(audio_id))}
+                r = self.s.post('https://vk.com/al_audio.php', data)
+                res = r.content[r.content.find('https:'):r.content.find('?')].replace('\\/', '/')
+                return res
+            else:
+                return ''
+        else:
+            return ''
