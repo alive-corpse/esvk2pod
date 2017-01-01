@@ -93,7 +93,7 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                     rss.addItem(title=a[c]['artist'] + ' - ' + a[c]['title'] + ' [' + dur
                                                 + ']', description=description, link=link, 
                                                 enclosure_url=localaudiourl + '/' + str(a[c]['owner_id']) + '/' +
-                                                str(a[c]['id']), enclosure_type='audio/mpeg',
+                                                str(a[c]['id']) + '.mp3', enclosure_type='audio/mpeg',
                                                 pubDate=datetime.strftime(datetime.fromtimestamp(int(i['date'])),
                                                                           '%a, %d %b %Y %T'))
             return rss.Feed()
@@ -153,7 +153,7 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                         else:
                                             audiotitle = a[c]['artist']
                                     description += '<br><a href="%s">%s</a>' % (localaudiourl + '/' +
-                                                base64.b16encode(a[c]['url'].split('?')[0]) + '.mp3', audiotitle)
+                                                    str(a[c]['owner_id']) + '/' + str(a[c]['id']) + '.mp3', audiotitle)
                                 if c == 'link':
                                     if a[c].has_key('description'):
                                         description += '</br>' + a[c]['description']
@@ -242,6 +242,7 @@ def vk2rssq(query='', count=10, offset=0):
 @route('/' + audiopostfix + '/<owner_id>/<audio_id>', method='GET')
 def audioStream(owner_id='', audio_id=''):
     if owner_id and audio_id:
+        audio_id = audio_id.replace('.mp3', '')
         url = vw.getAudio(owner_id, audio_id)
         headers = vw.s.head(url).headers
         for h in ['content-length', 'expires', 'content-type']:
@@ -254,6 +255,7 @@ def audioStream(owner_id='', audio_id=''):
 @route('/' + audiopostfix + '/<owner_id>/<audio_id>', method='HEAD')
 def audioHead(owner_id='', audio_id=''):
     if owner_id and audio_id:
+        audio_id = audio_id.replace('.mp3', '')
         url = vw.getAudio(owner_id, audio_id)
         return vw.s.head(url).raw
     else:
