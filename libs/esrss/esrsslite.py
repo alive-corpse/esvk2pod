@@ -29,23 +29,18 @@ class esRss:
         count = 0
         if image_url:
             tmpelem = Element('image')
-            if image_url:
-                tmpelem2 = Element('url')
-                tmpelem2.text = image_url
-                tmpelem.append(tmpelem2)
-                count +=1
+            tmpelem2 = Element('url')
+            tmpelem2.text = image_url
+            tmpelem.append(tmpelem2)
             if image_title:
                 tmpelem2 = Element('title')
                 tmpelem2.text = image_title
                 tmpelem.append(tmpelem2)
-                count += 1
             if image_link:
                 tmpelem2 = Element('link')
                 tmpelem2.text = image_link
                 tmpelem.append(tmpelem2)
-                count += 1
-        if count:
-            self.channel.append(Element('image'))
+            self.channel.append(tmpelem)
 
     def __err__(self, message='', code=0):
         if message:
