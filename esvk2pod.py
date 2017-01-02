@@ -56,7 +56,6 @@ def duration(sec):
         dur = str(s / 60 / 60) + ':' + dur
     return dur
 
-
 def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
     if gname:
         if int(count) > 100:
@@ -92,7 +91,7 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                         dur = duration(a[c]['duration'])
                                     rss.addItem(title=a[c]['artist'] + ' - ' + a[c]['title'] + ' [' + dur
                                                 + ']', description=description, link=link, 
-                                                enclosure_url=localaudiourl + '/' + str(a[c]['owner_id']) + '/' +
+                                                enclosure_url=localaudiourl + '/' + str(a[c]['owner_id']) + '_' +
                                                 str(a[c]['id']) + '.mp3', enclosure_type='audio/mpeg',
                                                 pubDate=datetime.strftime(datetime.fromtimestamp(int(i['date'])),
                                                                           '%a, %d %b %Y %T'))
@@ -100,7 +99,6 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
         else:
             print "ERROR: Group is closed"
             return ''
-
 
 def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
     if gname:
@@ -153,7 +151,8 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                         else:
                                             audiotitle = a[c]['artist']
                                     description += '<br><a href="%s">%s</a>' % (localaudiourl + '/' +
-                                                    str(a[c]['owner_id']) + '/' + str(a[c]['id']) + '.mp3', audiotitle)
+                                                    str(a[c]['owner_id']) + '_' + str(a[c]['id']) + '/' + audiotitle +
+                                                    '.mp3', audiotitle)
                                 if c == 'link':
                                     if a[c].has_key('description'):
                                         description += '</br>' + a[c]['description']
@@ -208,7 +207,6 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
             print "ERROR: Group is closed"
             return ''
 
-
 @route('/')
 def root():
     return 'Hello!'
@@ -239,11 +237,12 @@ def vk2rssq(query='', count=10, offset=0):
         response.headers['Content-Type'] = 'text/plain'
         return 'Empty request'
 
-@route('/' + audiopostfix + '/<owner_id>/<audio_id>', method='GET')
-def audioStream(owner_id='', audio_id=''):
-    if owner_id and audio_id:
-        audio_id = audio_id.replace('.mp3', '')
-        url = vw.getAudio(owner_id, audio_id)
+@route('/' + audiopostfix + '/<oa_id>', method='GET')
+@route('/' + audiopostfix + '/<oa_id>/<title>', method='GET')
+def audioStream(oa_id='', title=''):
+    if oa_id:
+        oa_id = oa_id.replace('.mp3', '')
+        url = vw.getAudio(oa_id)
         headers = vw.s.head(url).headers
         for h in ['content-length', 'expires', 'content-type']:
             response.headers.append(h, headers[h])
@@ -252,11 +251,12 @@ def audioStream(owner_id='', audio_id=''):
         response.headers['Content-Type'] = 'text/plain'
         return 'Empty request'
 
-@route('/' + audiopostfix + '/<owner_id>/<audio_id>', method='HEAD')
-def audioHead(owner_id='', audio_id=''):
-    if owner_id and audio_id:
-        audio_id = audio_id.replace('.mp3', '')
-        url = vw.getAudio(owner_id, audio_id)
+@route('/' + audiopostfix + '/<oa_id>', method='HEAD')
+@route('/' + audiopostfix + '/<oa_id>/<title>', method='HEAD')
+def audioHead(oa_id='', title=''):
+    if oa_id:
+        oa_id = oa_id.replace('.mp3', '')
+        url = vw.getAudio(oa_id)
         return vw.s.head(url).raw
     else:
         response.headers['Content-Type'] = 'text/plain'

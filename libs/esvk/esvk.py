@@ -87,19 +87,21 @@ class esVKWall:
         else:
             return ''
 
-    def getAudio(self, owner_id, audio_id):
+    def getAudio(self, oa_id):
         """
         Method to get audio urls from vk
         :param audio: array of strings or string like as 'ownerid_id'
         :return: dict of records like 'ownerid_id': 'audiourl'
         """
-        if owner_id and audio_id and self.uname and self.__pwd:
+        if oa_id and self.uname and self.__pwd:
             r = self.s.get('https://m.vk.com/')
-            authurl = re.findall('form method="post" action="(.*)"', r.content)[0]
-            data = {'email': self.uname, 'pass': self.__pwd}
-            r = self.s.post(authurl, data)
+            authurl = re.findall('form method="post" action="(.*)"', r.content)
+            if authurl:
+                authurl = authurl[0]
+                data = {'email': self.uname, 'pass': self.__pwd}
+                r = self.s.post(authurl, data)
             if r.content.find('<span class="mm_label">') != -1:
-                data = {'act': 'reload_audio', 'al': 1, 'ids': '%s_%s' % (str(owner_id), str(audio_id))}
+                data = {'act': 'reload_audio', 'al': 1, 'ids': oa_id}
                 r = self.s.post('https://vk.com/al_audio.php', data)
                 res = r.content[r.content.find('https:'):r.content.find('?')].replace('\\/', '/')
                 return res
