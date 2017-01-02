@@ -81,7 +81,6 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                     description = vw.getBiggestPhoto(a[c], True) + '<br>' + description
                             for c in a.keys():
                                 if c == 'audio':
-                                    print a
                                     if i.has_key('from_id'):
                                         link = 'https://vk.com/wall' + str(i['from_id']) + '_' + str(i['id'])
                                     elif i.has_key('owner_id'):
