@@ -81,6 +81,7 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                     description = vw.getBiggestPhoto(a[c], True) + '<br>' + description
                             for c in a.keys():
                                 if c == 'audio':
+                                    print a
                                     if i.has_key('from_id'):
                                         link = 'https://vk.com/wall' + str(i['from_id']) + '_' + str(i['id'])
                                     elif i.has_key('owner_id'):
@@ -89,8 +90,7 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                         link = ''
                                     if a[c].has_key('duration'):
                                         dur = duration(a[c]['duration'])
-                                    rss.addItem(title=a[c]['artist'] + ' - ' + a[c]['title'] + ' [' + dur
-                                                + ']', description=description, link=link, 
+                                    rss.addItem(title=a[c]['artist'] + ' - ' + a[c]['title'], description=description, link=link,
                                                 enclosure_url=localaudiourl + '/' + str(a[c]['owner_id']) + '_' +
                                                 str(a[c]['id']) + '.mp3', enclosure_type='audio/mpeg',
                                                 pubDate=datetime.strftime(datetime.fromtimestamp(int(i['date'])),
