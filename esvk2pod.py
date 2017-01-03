@@ -7,8 +7,8 @@ and rss feeds for aggregators
 """
 
 import os
+import re
 import sys
-import base64
 from datetime import datetime
 from libs.esvk.esvk import esVKWall
 from libs.esrss.esrsslite import esRss
@@ -71,6 +71,7 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
             if items.has_key('items'):
                 items = items['items']
             for i in items:
+                content = ''
                 if type(i) == dict:
                     if i.has_key('text'):
                         description = i['text']
@@ -87,13 +88,22 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                         link = 'https://vk.com/wall' + str(i['owner_id']) + '_' + str(['id'])
                                     else:
                                         link = ''
-                                    if a[c].has_key('duration'):
-                                        dur = duration(a[c]['duration'])
-                                    rss.addItem(title=a[c]['artist'] + ' - ' + a[c]['title'], description=description, link=link,
-                                                enclosure_url=localaudiourl + '/' + str(a[c]['owner_id']) + '_' +
-                                                str(a[c]['id']) + '.mp3', enclosure_type='audio/mpeg',
-                                                pubDate=datetime.strftime(datetime.fromtimestamp(int(i['date'])),
-                                                                          '%a, %d %b %Y %T'))
+                                    if link:
+                                        if not content:
+                                            r = vw.s.get(link)
+                                            if r.ok:
+                                                content = r.content.replace('\n', ' ')
+                                    oa_id = str(a[c]['owner_id']) + '_' + str(a[c]['id'])
+                                    dur = re.findall('(?u)play_' + oa_id + '.*?_audio_duration">(.*?)<',
+                                               content)
+                                    if dur:
+                                        dur = ' [%s]' % dur[0]
+                                    else:
+                                        dur = ''
+                                    rss.addItem(title=a[c]['artist'] + ' - ' + a[c]['title'] + dur,
+                                                description=description, link=link, enclosure_url=localaudiourl + '/' +
+                                                oa_id + '.mp3', enclosure_type='audio/mpeg', pubDate=datetime.strftime(
+                                                datetime.fromtimestamp(int(i['date'])), '%a, %d %b %Y %T'))
             return rss.Feed()
         else:
             print "ERROR: Group is closed"
