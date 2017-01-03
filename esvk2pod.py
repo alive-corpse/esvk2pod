@@ -218,7 +218,7 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
 
 @route('/')
 def root():
-    return 'Hello!'
+    return static(filename='index.html', root=os.path.join(os.path.curdir, 'static'), mimetype='text/html')
 
 @route('/favicon.ico')
 def get_favicon():
