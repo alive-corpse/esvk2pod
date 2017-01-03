@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ESVK2pod</title>
+<head>
+<body>
+        <h1>ESVK2Pod</h1>
+
+
+        <p align="justify">It's utility for convert vk wall records to rss feed, adapted for podcast players. Main idea of this service - to make some instrument for getting public accessible audiobooks and music from vk.com group wall's records to the podcast players like as <a href="http://antennapod.org/">AnthennaPod</a> for android or any others without logging in or tokens. Also as a DevOps I like when small application has small dependencies and deploy simplicity.</p>
+
+
+    <h3>Dependencies</h3>
+    <ul>
+        <li>python 2.7</li>
+        <li>python-requests</li>
+    </ul>
+
+    <h3>Dependencies installation:</h3>
+        For Debian based operation systems:
+
+        <code>sudo apt-get update && sudo apt-get install -y python python-requests</code>
+
+
+      Using python pip:
+
+      <code>sudo pip install --upgrade requests</code>
+
+    Maybe you'll need to install libxslt-devel libxml2-devel under RH based systems
+
+
+
+    <h3>Parameters</h3>
+    There are three parameters to start service
+    <ul>
+        <li>1st parameter - port (default 8080)</li>
+        <li>2nd parameter - ip address (default localhost)</li>
+        <li>3th parameter - url prefix and optionally port for audiolink generation</li>
+    </ul>
+        
+        
+    <h3>Examples</h3>
+    <code>
+        ./esvk2pod<br>
+        starts service on port 8080 of localhost<br>
+        ./esvk2pod 9000<br>
+            starts service on port 9000 of localhost<br>
+        ./esvk2pod 9000 192.168.10.20<br>
+            starts service on port 9000 of 192.168.10.20 address<br>
+        ./esvk2pod 9000 192.168.10.20 yourdomain.com:8000<br>
+            starts service on port 9000 of 192.168.10.20 address<br>
+            and made urls for getting audio like this<br>
+            http://yourdomain.com:8000/vk2podaudio/1234567890abcdef...abcdef.mp3<br>
+            It's usefull, if you planning use it behind reverse <br>
+            proxy like Nginx. Sure, you can use IP address<br>
+            instead domain name and you can use domain without<br>
+            port definition.<br>
+    </code>
+
+    <h3>Using examples</h3>
+    You can just append one of the following urls to your podcast player, changing "groupname" to the real name of vk group (for example, try free_audiobooks):
+
+    http://localhost:8080/vk2pod/groupname
+
+      Will get 20 records from wall and filter out records that hasn't audio attach, then it will made rss item for each audio attach with content of original record
+      
+    http://localhost:8080/vk2pod/groupname/30
+
+      The same, but it will get 30 records instead 20. Count maximum is 100 at the moment, but if you need more, you can easily fix it in code. :)
+      
+    http://localhost:8080/vk2pod/groupname/30/5
+
+      The same that above example, but with offset of 5 records
+
+
+
+    <h3>Docker container</h3>
+    You can find Dockerfile in directory docker. Container based on debian:latest. I think, you can change it to ubutu:latest, but I haven't check it yet. Also you can use scripts build-run.sh and stop-remove.sh from docker folder. The first script has one parameter, than is equals of 3th parameters for runnning service. For example, if you frontend has domain name test.com, you can build container with command ./build-run.sh test.com
+    Attention: container's building will download original code from github instead getting local code from upper level directory.
+
+    <h3>What's new?</h3>
+    2016.12.31 - Library esrss rewrited with using of xml instead of lxml. So, It's removing one big dependence - python-lxml. Little changes in Docker file.
+
+    <h3>Notice</h3>
+    This code is provided for free and without any garanties. But you can feel free to send me any feedback to <a href="mailto:evgeniy.shumilov@gmail.com">evgeniy.shumilov@gmail.com</a>.
+
+</body>
+</html>
