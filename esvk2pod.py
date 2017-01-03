@@ -100,9 +100,10 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                         dur = ' [%s]' % dur[0]
                                     else:
                                         dur = ''
-                                    rss.addItem(title=a[c]['artist'] + ' - ' + a[c]['title'] + dur,
-                                                description=description, link=link, enclosure_url=localaudiourl + '/' +
-                                                oa_id + '.mp3', enclosure_type='audio/mpeg', pubDate=datetime.strftime(
+                                    title = a[c]['artist'] + ' - ' + a[c]['title']
+                                    rss.addItem(title=title + dur, description=description, link=link,
+                                                enclosure_url=localaudiourl + '/' + oa_id + '/' + title + '.mp3',
+                                                enclosure_type='audio/mpeg', pubDate=datetime.strftime(
                                                 datetime.fromtimestamp(int(i['date'])), '%a, %d %b %Y %T'))
             return rss.Feed()
         else:
@@ -149,8 +150,8 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                         description += '</br><a href="%s"><img src="%s"></a></br> [VIDEO]' % (link,
                                                         vw.getBiggestPhoto(a[c]))
                                 if c == 'audio':
-                                    if a[c].has_key('duration'):
-                                        dur = duration(a[c]['duration'])
+                                    # if a[c].has_key('duration'):
+                                    #     dur = duration(a[c]['duration'])
                                     audiotitle = ''
                                     if a[c].has_key('title'):
                                         audiotitle = a[c]['title']
@@ -225,8 +226,8 @@ def get_favicon():
     return static(filename='favicon.ico', root=os.path.join(os.path.curdir, 'static'), mimetype='image/x-icon')
 
 @route('/vk2pod/<query>')
-@route('/vk2pod/<query>/<count>')
-@route('/vk2pod/<query>/<count>/<offset>')
+@route('/vk2pod/<query>/<count:re:[0-9]+>')
+@route('/vk2pod/<query>/<count:re:[0-9]+>/<offset:re:[0-9]+>')
 def vk2podq(query='', count=10, offset=0):
     if query:
         response.headers['Content-Type'] = 'xml/application'
