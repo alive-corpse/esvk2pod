@@ -46,9 +46,11 @@ RUN cd /opt && curl -L -o pypy-$PYPY.tar.bz2 "https://bitbucket.org/squeaky/port
 
 ADD . /opt/esvk2pod/
 
-EXPOSE 8080
-
 ARG URLPREF=localhost
 
-ENTRYPOINT /opt/esvk2pod/esvk2pod.py 8080 127.0.0.1 $URLPREF
+EXPOSE 8080
+
+WORKDIR /opt/esvk2pod
+
+ENTRYPOINT /opt/esvk2pod/esvk2pod.py 8080 0.0.0.0 $URLPREF
 
