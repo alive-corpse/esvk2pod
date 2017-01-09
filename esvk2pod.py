@@ -101,6 +101,7 @@ def wall2Pod(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                     else:
                                         dur = ''
                                     title = a[c]['artist'] + ' - ' + a[c]['title']
+                                    title = title.replace('/', '_')
                                     rss.addItem(title=title + dur, description=description, link=link,
                                                 enclosure_url=localaudiourl + '/' + oa_id + '/' + title + '.mp3',
                                                 enclosure_type='audio/mpeg', pubDate=datetime.strftime(
@@ -160,6 +161,7 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                             audiotitle = a[c]['artist'] + ' - ' + audiotitle
                                         else:
                                             audiotitle = a[c]['artist']
+                                    title = title.replace('/', '_')
                                     description += '<br><a href="%s">%s</a>' % (localaudiourl + '/' +
                                                     str(a[c]['owner_id']) + '_' + str(a[c]['id']) + '/' + audiotitle +
                                                     '.mp3', audiotitle)
