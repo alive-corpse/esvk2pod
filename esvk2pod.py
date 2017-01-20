@@ -142,13 +142,13 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
                         for a in i['attachments']:
                             for c in a.keys():
                                 if c == 'photo':
-                                    description += vw.getBiggestPhoto(a[c], True) + '<br>'
+                                    description += '<br>' + vw.getBiggestPhoto(a[c], True) + '<br>'
                                 if c == 'video':
                                     if a[c].has_key('description'):
-                                        description += '</br><a href="%s"><img src="%s"></a></br>%s [VIDEO]' % (link,
+                                        description += '<br><a href="%s"><img src="%s"></a><br>%s [VIDEO]' % (link,
                                                         vw.getBiggestPhoto(a[c]), a[c]['description'])
                                     else:
-                                        description += '</br><a href="%s"><img src="%s"></a></br> [VIDEO]' % (link,
+                                        description += '<br><a href="%s"><img src="%s"></a><br> [VIDEO]' % (link,
                                                         vw.getBiggestPhoto(a[c]))
                                 if c == 'audio':
                                     # if a[c].has_key('duration'):
@@ -167,7 +167,7 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                                     '.mp3', audiotitle)
                                 if c == 'link':
                                     if a[c].has_key('description'):
-                                        description += '</br>' + a[c]['description']
+                                        description += '<br>' + a[c]['description']
                                     if a[c].has_key('title'):
                                         ltitle = a[c]['title']
                                         if not title and len(i['attachments']) == 1:
@@ -177,25 +177,25 @@ def wall2RSS(gname, localaudiourl=localaudiourl, count=20, offset=0):
                                     if a[c].has_key('photo'):
                                         photo = vw.getBiggestPhoto(a[c]['photo'])
                                         if ltitle:
-                                            description += '</br><a href="%s"><img src="%s" alt="%s"></a>' % (
+                                            description += '<br><a href="%s"><img src="%s" alt="%s"></a>' % (
                                             a[c]['url'], photo, ltitle)
                                         else:
-                                            description += '</br><a href="%s"><img src="%s"></a>' % (
+                                            description += '<br><a href="%s"><img src="%s"></a>' % (
                                             a[c]['url'], photo)
                                     else:
                                         if ltitle:
-                                            description += '</br><a href="%s">%s</a>' % (a[c]['url'], ltitle)
+                                            description += '<br><a href="%s">%s</a>' % (a[c]['url'], ltitle)
                                 if c == 'doc':
                                     if a[c].has_key('title'):
                                         dtitle = a[c]['title']
                                     if a[c].has_key('ext'):
                                         if a[c]['ext'] == u'gif':
-                                            photo = '<a href="%s">%s</br><img src="%s" alt="%s"></a>' % \
+                                            photo = '<a href="%s">%s<br><img src="%s" alt="%s"></a>' % \
                                                     (a[c]['url'], dtitle, a[c]['url'], dtitle)
                                     if a[c].has_key('preview'):
                                         if a[c]['preview'].has_key('photo'):
                                             if dtitle and not photo:
-                                                photo = '<a href="%s">%s</br><img src="%s" alt="%s"></a>' % \
+                                                photo = '<a href="%s">%s<br><img src="%s" alt="%s"></a>' % \
                                                     (a[c]['url'], dtitle, vw.getBiggestPhoto(a[c]['preview']['photo']),
                                                     dtitle)
                                             else:
