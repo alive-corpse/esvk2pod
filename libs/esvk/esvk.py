@@ -21,6 +21,7 @@ class esVKWall:
         self.baseurl = 'https://api.vk.com/method/'
         self.uname = ''
         self.passwd = ''
+        self.skey=''
         cpath = os.path.join(os.curdir, 'esvk.conf')
         if os.path.isfile(cpath):
             with open(cpath) as f:
@@ -30,6 +31,8 @@ class esVKWall:
                         self.uname = '='.join(l.split('=')[1:]).replace('"', '').replace("'", '').strip()
                     if k == 'passwd':
                         self.__pwd = '='.join(l.split('=')[1:]).replace('"', '').replace("'", '').strip()
+                    if k == 'skey':
+                        self.skey = '='.join(l.split('=')[1:]).replace('"', '').replace("'", '').strip()
 
     def getGroup(self, gname):
         if gname:
@@ -43,7 +46,7 @@ class esVKWall:
         if gname:
             group = self.getGroup(gname)
             gid = group['id']
-            raw = self.s.get(self.baseurl + 'wall.get?v=' + self.api + '&owner_id=-' + str(gid) + '&count=' +
+            raw = self.s.get(self.baseurl + 'wall.get?v=' + self.api + '&access_token=' + self.skey + '&owner_id=-' + str(gid) + '&count=' +
                              str(count) + '&offset=' + str(offset))
             wall = json.loads(raw.text)
             return wall
